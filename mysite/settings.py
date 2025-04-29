@@ -86,7 +86,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("172.20.221.144", 6379)],  # Redis corriendo en tu WSL2
+            "hosts": [("127.0.0.1", 6379)],  # Redis corriendo en tu WSL2
         },
     },
 }
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'America/Mexico_city'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
