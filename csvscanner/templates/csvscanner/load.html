@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Django Girls blog</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <header>
+            <h1><a href="/">Django Girls Blog</a></h1>
+        </header>
+
+        <article>
+            <h2>Cargar csv</h2>
+            <form method='POST' enctype="multipart/form-data" id='send_csv'>
+                {% csrf_token %}
+                <input type='file' id='loadCsv' size="100" name="csv_file" accept='.csv'><br>
+                <input type="hidden" name="id_proceso" id="id_proceso_input">
+                <input id="submit" type="submit" value="Subir archivo">
+            </form>
+        </article>
+
+        <hr>
+        <div id="logs" style="height: 3cm; overflow-y: auto;">
+    
+        </div>
+        <hr>
+
+        <article>
+            <table>
+                <tr>
+                    {% for encabezado in encabezados %}
+                        <th>
+                            {{ encabezado }}
+                        </th>
+                    {% endfor %}
+                </tr>
+                {% for fila in datos %}
+                    <tr>
+                        {% for dato in fila %}
+                        <td> {{ dato }} </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                <tr></tr>
+                <tr></tr>
+            </table>
+        </article>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.7/uuid.min.js"></script>
+        <script>
+            const id_proceso = uuid.v4();
+            let canal;
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('id_proceso_input').value = id_proceso;
+            });
+
+            document.querySelector("#send_csv").addEventListener("submit", function(e){
+                canal = new WebSocket(
+                    'ws://'
+                    + window.location.host
+                    + '/ws/channel/'
+                    + id_proceso
+                    + '/'
+                );
+
+                canal.onmessage = function(e){
+                    const data = JSON.parse(e.data);
+                    logsDiv = document.querySelector('#logs');
+                    document.querySelector('#logs').innerHTML += (data.mensaje + '<br>');
+                    logsDiv.scrollTop = logsDiv.scrollHeight;
+                }
+
+                canal.onopen = function(e) {
+                    console.log("WebSocket abierto con id_proceso: " + id_proceso);
+                };
+    
+                canal.onclose = function(e) {
+                    console.error('Chat socket closed unexpectedly');
+                };
+            });
+        </script>
+    </body>
+</html>
